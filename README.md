@@ -25,3 +25,7 @@ Link: https://goo.gl/6d0F9j
 1. Run main.py by using the command: "python main.py"
 2. Visit localhost:5000 on your browser to view the site. 
 
+## Demo Video
+
+Link : https://www.youtube.com/watch?v=yOqvf3yjPeI
+
