@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>OpenStreetMap</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/3.19/esri/css/esri.css">
+    <style>
+        html, body, #esri-map-container {
+            padding: 0px;
+            margin: 0px;
+            height: 100%;
+        }
+
+
+    </style>
+<style>
+      .label-primary {
+            background: #03a9f4;
+        }
+
+        #chart {
+            height: 500px;
+        }
+
+        .node rect {
+            cursor: move;
+            fill-opacity: .9;
+            shape-rendering: crispEdges;
+        }
+
+        .node text {
+            pointer-events: none;
+            text-shadow: 0 1px 0 #fff;
+        }
+
+        .link {
+            fill: none;
+            stroke: #000;
+            stroke-opacity: .2;
+        }
+
+        .link:hover {
+            stroke-opacity: .5;
+        }
+
+        .loader {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            z-index: 1;
+            width: 150px;
+            height: 150px;
+            margin: -75px 0 0 -75px;
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid #3498db;
+            width: 120px;
+            height: 120px;
+            -webkit-animation: spin 2s linear infinite;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .btn {
+            cursor: pointer;
+        }
+
+        .bar {
+            fill: #ff4d4d;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #D4D8DA;
+            stroke-width: 1px;
+            shape-rendering: crispEdges;
+        }
+
+        .x path {
+            display: none;
+        }
+
+        html, body, #esri-map-container {
+            padding: 0px;
+            margin: 0px;
+            height: 100%;
+        }
+
+        .media:hover {
+            box-shadow: inset 0 0 0 3px #3a7999;
+            cursor: pointer;
+            box-shadow: 0px 0px 70px #000000;
+            z-index: 2;
+            -webkit-transition: all 200ms ease-in;
+            -webkit-transform: scale(1.0);
+            -ms-transition: all 200ms ease-in;
+            -ms-transform: scale(1.0);
+            -moz-transition: all 200ms ease-in;
+            -moz-transform: scale(1.0);
+            transition: all 200ms ease-in;
+            transform: scale(1.0);
+        }
+
+        .hoverify {
+            background-color: #e6f2ff;
+            box-shadow: inset 0 0 0 2px #3a7999;
+            cursor: pointer;
+            box-shadow: 0px 0px 70px #000000;
+            z-index: 2;
+            -webkit-transition: all 200ms ease-in;
+            -webkit-transform: scale(1.0);
+            -ms-transition: all 200ms ease-in;
+            -ms-transform: scale(1.0);
+            -moz-transition: all 200ms ease-in;
+            -moz-transform: scale(1.0);
+            transition: all 200ms ease-in;
+            transform: scale(1.0);
+        }
+
+        .media2:hover {
+            cursor: pointer;
+            z-index: 2;
+            -webkit-transition: all 200ms ease-in;
+            -webkit-transform: scale(1.2);
+            -ms-transition: all 200ms ease-in;
+            -ms-transform: scale(1.2);
+            -moz-transition: all 200ms ease-in;
+            -moz-transform: scale(1.2);
+            transition: all 200ms ease-in;
+            transform: scale(1.2);
+        }
+
+        .bar1 {
+            fill: #6699ff;
+        }
+
+        .bar2 {
+            fill: #ff5050;
+        }
+
+        .bar:hover {
+            fill: #800000;
+        }
+
+        .bar1:hover {
+            fill: #002b80;
+        }
+
+        .bar2:hover {
+            fill: #800000;
+        }
+
+        .toolTip {
+            position: absolute;
+            display: none;
+            min-width: auto;
+            height: auto;
+            background: none repeat scroll 0 0 #ffffff;
+            border: 1px solid #6F257F;
+            padding: 10px;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        rect.bordered {
+            stroke: #E6E6E6;
+            stroke-width: 2px;
+        }
+
+        text.mono {
+            font-size: 9pt;
+            font-family: Consolas, courier;
+            fill: #aaa;
+        }
+
+        text.axis-workweek {
+            fill: #000;
+        }
+
+        text.axis-worktime {
+            fill: #000;
+        }
+    </style>
+
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        div#container {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        div#scroll {
+            overflow: auto;
+        }
+
+        div#scrollNew {
+            position: relative;
+            overflow: auto;
+        }
+
+        .axis--grid .domain {
+            fill: #ddd;
+            stroke: none;
+        }
+
+        .axis--x .domain,
+        .axis--grid .tick line {
+            stroke: #fff;
+        }
+
+        .axis--grid .tick--minor line {
+            stroke-opacity: .5;
+        }
+
+        .button {
+            background-color: #e6e6e6;
+            border: none;
+            color: black;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-family: "Calibri";
+            font-size: 16px;
+            margin: 2px 1px;
+            cursor: pointer;
+        }
+
+        span.stars, span.stars span {
+            display: block;
+            background: url(/image/stars/) 0 -16px repeat-x;
+            width: 80px;
+            height: 16px;
+        }
+
+        span.stars span {
+            background-position: 0 0;
+        }
+
+        .material-switch > input[type="checkbox"] {
+            display: none;
+        }
+
+        .material-switch > label {
+            cursor: pointer;
+            height: 0px;
+            position: relative;
+            width: 40px;
+        }
+
+        .material-switch > label::before {
+            background: rgb(0, 0, 0);
+            box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            content: '';
+            height: 16px;
+            margin-top: -8px;
+            position: absolute;
+            opacity: 0.3;
+            transition: all 0.4s ease-in-out;
+            width: 40px;
+        }
+
+        .material-switch > label::after {
+            background: rgb(255, 255, 255);
+            border-radius: 16px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+            content: '';
+            height: 24px;
+            left: -4px;
+            margin-top: -8px;
+            position: absolute;
+            top: -4px;
+            transition: all 0.3s ease-in-out;
+            width: 24px;
+        }
+
+        .material-switch > input[type="checkbox"]:checked + label::before {
+            background: inherit;
+            opacity: 0.5;
+        }
+
+        .material-switch > input[type="checkbox"]:checked + label::after {
+            background: inherit;
+            left: 20px;
+        }
+
+        #scroll2 {
+            position: relative;
+            overflow: auto;
+        }
+
+    </style>
+
+    <style>
+
+        .label-primary {
+            background: #03a9f4;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        span.stars, span.stars span {
+            display: block;
+            background: url(/image/stars/) 0 -16px repeat-x;
+            width: 80px;
+            height: 16px;
+        }
+
+        span.stars span {
+            background-position: 0 0;
+        }
+
+        .media:hover {
+            box-shadow: inset 0 0 0 1px #3a7999;
+            cursor: pointer;
+            box-shadow: 0px 0px 150px #000000;
+            z-index: 2;
+            -webkit-transition: all 200ms ease-in;
+            -webkit-transform: scale(1.0);
+            -ms-transition: all 200ms ease-in;
+            -ms-transform: scale(1.0);
+            -moz-transition: all 200ms ease-in;
+            -moz-transform: scale(1.0);
+            transition: all 200ms ease-in;
+            transform: scale(1.0);
+        }
+
+        div#scroll {
+            overflow: auto;
+        }
+
+        .material-switch > input[type="checkbox"] {
+            display: none;
+        }
+
+        .material-switch > label {
+            cursor: pointer;
+            height: 0px;
+            position: relative;
+            width: 40px;
+        }
+
+        .material-switch > label::before {
+            background: rgb(0, 0, 0);
+            box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            content: '';
+            height: 16px;
+            margin-top: -8px;
+            position: absolute;
+            opacity: 0.3;
+            transition: all 0.4s ease-in-out;
+            width: 40px;
+        }
+
+        .material-switch > label::after {
+            background: rgb(255, 255, 255);
+            border-radius: 16px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+            content: '';
+            height: 24px;
+            left: -4px;
+            margin-top: -8px;
+            position: absolute;
+            top: -4px;
+            transition: all 0.3s ease-in-out;
+            width: 24px;
+        }
+
+        .material-switch > input[type="checkbox"]:checked + label::before {
+            background: inherit;
+            opacity: 0.5;
+        }
+
+        .material-switch > input[type="checkbox"]:checked + label::after {
+            background: inherit;
+            left: 20px;
+        }
+
+        .axis--grid .domain {
+            fill: #ddd;
+            stroke: none;
+        }
+
+        .axis--x .domain,
+        .axis--grid .tick line {
+            stroke: #fff;
+        }
+
+        .axis--grid .tick--minor line {
+            stroke-opacity: .5;
+        }
+
+        div#scrollNew {
+            position: relative;
+            overflow: auto;
+        }
+
+
+    </style>
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/css/tether.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"
+          integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jspanel3/3.7.0/jquery.jspanel.css"/>
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/0.6.16/css/perfect-scrollbar.css"/>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <script>
+          var script1 = document.createElement("script"),
+            script2 = document.createElement("script"),
+             script3 = document.createElement("script"),
+            oldD3;
+
+        function noConflict() {
+            oldD3 = d3;
+            console.log("loaded old");
+            script2.type = 'text/javascript';
+            script2.src = "https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.2/d3.min.js";
+            script2.addEventListener("load", ready, false);
+            document.head.appendChild(script2);
+        }
+
+        function ready() {
+            console.log("loaded new");
+            console.log(d3, oldD3);
+
+            script3.type = 'text/javascript';
+            script3.src = "{{ url_for('static', filename='nv.d3.min.js') }}";
+            script3.addEventListener("load", disp, false);
+            document.head.appendChild(script3);
+        }
+        function disp() {
+            console.log("Done");
+        }
+
+        script1.type = 'text/javascript';
+        script1.src = "http://d3js.org/d3.v4.js";
+        script1.addEventListener("load", noConflict, false);
+        document.head.appendChild(script1);
+
+        </script>
+     <link rel="stylesheet" href="{{ url_for('static', filename='nv.d3.css') }}"/>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='nv.d3.min.css') }}"/>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <!--  <script src="https://d3js.org/d3.v4.min.js"></script> -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jspanel3/3.6.0/jquery.jspanel-compiled.min.js"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"
+            integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
+            crossorigin="anonymous"></script>
+    <script type="text/javascript" src="http://malsup.github.io/jquery.blockUI.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/0.6.16/js/perfect-scrollbar.jquery.min.js"></script>
+
+    <script src="https://js.arcgis.com/3.19/"></script>
+
+
+
+    <script>
+        var map;
+        var bc;
+
+        require(["esri/map",
+                "dojo/dom",
+                "dojo/on",
+                "dojo/dom-class",
+                "dojo/_base/json",
+                "esri/config",
+                "esri/request",
+                "esri",
+                "esri/InfoTemplate",
+                "dojo/domReady!"],
+
+            function (Map,
+                      dom,
+                      on,
+                      domClass,
+                      dojoJson,
+                      esriConfig,
+                      esriRequest,
+                      esri,
+                      InfoTemplate) {
+
+                esriConfig.defaults.io.corsEnabledServers.push("http://www.localhost:5000/shobhit");
+                esriConfig.defaults.io.corsEnabledServers.push("http://www.localhost:5000/getCrimeFilterData");
+
+                map = new Map("esri-map-container", {
+                    basemap: "streets",  //For full list of pre-defined basemaps, navigate to http://arcg.is/1JVo6Wd
+                    center: [-74.011658, 40.757037],
+                    zoom: 13
+                });
+
+                selLayer = new esri.layers.GraphicsLayer();
+
+                on(map, "load", function () {
+                    // Hook up jQuery
+
+                    // Hook up jQuery
+                    map.addLayer(selLayer);
+
+
+                    //var iconPath = "M24.0,2.199C11.9595,2.199,2.199,11.9595,2.199,24.0c0.0,12.0405,9.7605,21.801,21.801,21.801c12.0405,0.0,21.801-9.7605,21.801-21.801C45.801,11.9595,36.0405,2.199,24.0,2.199zM31.0935,11.0625c1.401,0.0,2.532,2.2245,2.532,4.968S32.4915,21.0,31.0935,21.0c-1.398,0.0-2.532-2.2245-2.532-4.968S29.697,11.0625,31.0935,11.0625zM16.656,11.0625c1.398,0.0,2.532,2.2245,2.532,4.968S18.0555,21.0,16.656,21.0s-2.532-2.2245-2.532-4.968S15.258,11.0625,16.656,11.0625zM24.0315,39.0c-4.3095,0.0-8.3445-2.6355-11.8185-7.2165c3.5955,2.346,7.5315,3.654,11.661,3.654c4.3845,0.0,8.5515-1.47,12.3225-4.101C32.649,36.198,28.485,39.0,24.0315,39.0z";
+
+
+                    $(document).ready(jQueryReady);
+                });
+
+
+                function jQueryReady() {
+
+                    var creGra;
+
+                    $('body').on('mouseover', '.media', function createGra() {
+                        var lat = $(this).find(".latitude").html();
+
+                        var lng = $(this).find(".longitude").html();
+                        var markerSymbol2 = new esri.symbol.PictureMarkerSymbol('/image/pin3/', 24, 40);
+                        markerSymbol2.setOffset(0, 20);
+                        var graphi2 = new esri.Graphic(
+                            new esri.geometry.Point({latitude: lat, longitude: lng}));
+                        graphi2.symbol = markerSymbol2;
+                        creGra = map.graphics.add(graphi2);
+                    });
+                    $('body').on('mouseout', '.media', function removeGra() {
+                        map.graphics.remove(creGra);
+                    });
+
+                    $("#updateBt").click(function () {
+
+                        localStorage.setItem("place-id",$($(".media")[0]).find('.placeId').html());
+                        var panel3 = $.jsPanel({
+                            container: "#jsPanelLegendQuant",
+                            position: {
+                                left: 460,
+                                top: 100
+                            },
+                            id: "legendPanel1",
+                            contentSize: {width: 200, height: 240},
+                            theme: "light",
+                            headerRemove: true,
+                            content: '<img src="https://image.ibb.co/e9HDwQ/lege.png"   style="height: 240px; width: 200px;"><div></div>',
+                            callback: function () {
+                                this.content.css("padding", "0px");
+                            }
+                        });
+                        var arr = [];
+                        var i = 0;
+                        jQuery('.crimeC').each(function () {
+                            if (jQuery(this).is(':checked')) {
+                                arr[i] = jQuery(jQuery(this).parent()).next(3).html();
+                                i++;
+                            }
+                        });
+                        var rt = jQuery('#someSwitchOptionPrimary123').is(':checked');
+                        var rv = jQuery('#someSwitchOptionPrimary12345').is(':checked');
+                        var finData = {
+                            "crime": arr,
+                            "rating": rt,
+                            "review": rv,
+                            "startTime": startTime,
+                            "endTime": endTime
+                        };
+                        localStorage.setItem("crime_types", JSON.stringify(arr));
+                        localStorage.setItem("rating", rt);
+                        localStorage.setItem("review", rv);
+                        localStorage.setItem("startTime", startTime);
+                        localStorage.setItem("endTime", endTime);
+                        $.blockUI({
+                            css: {
+                                border: 'none',
+                                padding: '15px',
+                                backgroundColor: '#000',
+                                '-webkit-border-radius': '10px',
+                                '-moz-border-radius': '10px',
+                                opacity: .5,
+                                color: '#fff'
+                            }
+                        });
+
+                        $.ajax({
+                            async: true,
+                            url: "/getCrimeFilterData",
+                            type: 'POST',
+                            data: JSON.stringify(finData),
+                            timeout: 20000,
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (response) {
+                                $.unblockUI();
+                                map.graphics.clear();
+                                console.log(response);
+                                var result = eval(response['result']);
+
+                                //var result = response['result'];
+                                leftPanel(result);
+                                var sizes = [20, 30, 40, 50, 60];
+
+                                var color = ["#d7191c", "#ffffbf", "#2ca25f"];
+                                for (i = 0; i < result.length; i++) {
+
+                                    var markerSymbol = new esri.symbol.SimpleMarkerSymbol();
+                                    markerSymbol.setColor(new esri.Color(color[result[i]['crime_rank'] - 1]));
+                                    markerSymbol.setSize(sizes[result[i]['pop_rank'] - 1]);
+
+                                    var infoTemplate = new InfoTemplate(result[i]['name'], result[i]['formatted_address']);
+                                    var graphi = new esri.Graphic(
+                                        new esri.geometry.Point({
+                                            latitude: result[i]['lat'],
+                                            longitude: result[i]['lng']
+                                        }));
+                                    graphi.symbol = markerSymbol;
+                                    graphi.infoTemplate = infoTemplate;
+                                    map.graphics.add(graphi);
+                                }
+
+
+                                displayStream();
+                                placesHorizontalBar();
+
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                $.unblockUI();
+                                response = "err--" + XMLHttpRequest.status + " -- " +
+                                    XMLHttpRequest.statusText;
+                            }
+                        });
+
+                    });
+
+                }
+            });
+ function displayStream() {
+            $.ajax({
+                async: true,
+                url: "/streamdata",
+                type: 'GET',
+                timeout: 40000,
+                success: function (response) {
+                    response = JSON.parse(response);
+                    console.log(response);
+                    //console.log(histcatexplong);
+                    var histcatexplong = response;
+                    var colors = d3.scale.category20();
+
+                    var chart;
+                    nv.addGraph(function () {
+                        chart = nv.models.stackedAreaChart()
+                            .useInteractiveGuideline(true)
+                            .x(function (d) {
+
+                                return d[0]
+                            })
+                            .y(function (d) {
+                                return d[1]
+                            })
+                            .controlLabels({stacked: "Stacked"})
+                            .duration(300);
+
+                        chart.xAxis.tickFormat(function (d) {
+                            console.log("A", d);
+                            return d3.time.format('%A')(new Date(d))
+                        });
+                        chart.yAxis.tickFormat(d3.format(',.4f'));
+
+                        chart.legend.vers('furious');
+
+                        histcatexplong = histcatexplong.map(function (series) {
+                            if (series.placeId != localStorage.getItem("place-id")) {
+                                series.disabled = true;
+                            }
+                            series.values=series.values.slice(0, 7);
+                            return series;
+                        });
+                        console.log("A", histcatexplong);
+                        d3.select('#chart1')
+                            .datum(histcatexplong)
+                            .transition().duration(1000)
+                            .call(chart)
+                            .each('start', function () {
+                                setTimeout(function () {
+                                    d3.selectAll('#chart1 *').each(function () {
+                                        if (this.__transition__)
+                                            this.__transition__.duration = 1;
+                                    })
+                                }, 0)
+                            });
+
+                        nv.utils.windowResize(chart.update);
+                        return chart;
+                    });
+                //    document.getElementById("myDiv1Loader").style.display = "none";
+                //    document.getElementById("myDiv1").style.display = "block";
+                    jQuery("#newp2").click();
+                    jQuery("#newp").click();
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    response = "err--" + XMLHttpRequest.status + " -- " + XMLHttpRequest.statusText;
+                }
+            });
+        }
+
+     function placesHorizontalBar() {
+
+            var svg = oldD3.select("#placeHorizontal"),
+                margin = {
+                    top: 20, right: 20, bottom: 60, left: 520
+                },
+                width = +svg.attr("width") - margin.left - margin.right,
+                height = +svg.attr("height") - margin.top - margin.bottom;
+
+            var tooltip = oldD3.select("body").append("div").attr("class", "toolTip");
+            var x = oldD3.scaleLinear().range([0, width]);
+            var y = oldD3.scaleBand().range([height, 0]);
+
+            var Parameter = {"crime": "Crimes ", "rating": "Rating ", "popularity": "Popularity "};
+
+            var data = [];
+            {#            console.log("ready!");#}
+            oldD3.selectAll("#placeHorizontal > *").remove();
+
+            var g = svg.append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            var finData = {
+                'time_upper_bound': "20:00:00",
+                'time_lower_bound': "06:00:00",
+                'crime_types': JSON.parse(localStorage.getItem("crime_types"))
+            };
+
+            $.ajax({
+                async: true,
+                url: "/placesHorizontal",
+                type: 'POST',
+                data: JSON.stringify(finData),
+                timeout: 10000,
+                success: function (response) {
+                    var haha = jQuery("#placesBar option:selected").attr("val");
+                    {#                    console.log(response);#}
+                    response = JSON.parse(response);
+                    for (var i = 0; i < response.length; i++) {
+                        var temp = {};
+                        {#                        console.log(response[i]);#}
+                        temp["area"] = response[i]["name"];
+                        temp["value"] = response[i][haha];
+                        data.push(temp);
+                    }
+
+                    x.domain([0, oldD3.max(data, function (d) {
+                        return d.value;
+                    })]);
+                    y.domain(data.map(function (d) {
+                        return d.area;
+                    })).padding(0.1);
+
+                    g.append("g")
+                        .attr("class", "y axis")
+                        .call(oldD3.axisLeft(y)).selectAll('text')
+                        .style('font-size', '17px')
+                        .style('font', 'arial', 'sans-serif');
+
+                    g.append("g")
+                        .attr("transform", "translate(0," + height + ")")
+                        .call(oldD3.axisBottom(x)).selectAll('text')
+                        .style('font-size', '17px')
+                        .style('font', 'arial', 'sans-serif');
+                    g.append("text")
+                        .attr("transform",
+                            "translate(" + (width / 2) + " ," +
+                            (height + margin.top + 35) + ")")
+                        .style("text-anchor", "middle")
+                        .style("font-size", "25px")
+                        .text("Crime Counts");
+
+                    // text label for the y axis
+                    g.append("text")
+                        .attr("transform", "rotate(-90)")
+                        .attr("y", 0 - margin.left)
+                        .attr("x", 0 - (height / 2))
+                        .attr("dy", "1em")
+                        .style("text-anchor", "middle")
+                        .style("font-size", "25px")
+                        .text("Place Name");
+                    g.selectAll(".bar")
+                        .data(data)
+                        .enter().append("rect")
+                        .attr("class", "bar")
+                        .attr("x", 0)
+                        .attr("height", y.bandwidth())
+                        .attr("y", function (d) {
+                            return y(d.area);
+                        })
+                        .attr("width", function (d) {
+                            return x(d.value);
+                        })
+                        .on("mousemove", function (d) {
+                            tooltip
+                                .style("left", oldD3.event.pageX - 50 + "px")
+                                .style("top", oldD3.event.pageY - 70 + "px")
+                                .style("display", "inline-block")
+                                .html((d.area) + "<br>" + Parameter[haha] + (d.value));
+                        })
+                        .on("mouseout", function (d) {
+                            tooltip.style("display", "none");
+
+                        });
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    response = "err--" + XMLHttpRequest.status + " -- " + XMLHttpRequest.statusText;
+                }
+            });
+        }
+
+    </script>
+
+
+</head>
+<body>
+
+
+<div class="w3-cell-row" style="width: 100%;height: 100%">
+    <div id="place" class="w3-container w3-cell" style="height: 990px;width: 410px;padding: 3px;">
+        <div class="card">
+            <div class="card-header" style="background-color: #03a9f4;text-align: center;color: white">
+                <b><h1 style="font-size: 45px;">Places Of Interest</h1></b>
+                <p style="font-size: 30px;">Ordered by Safety and Rating</p>
+                <p>The major tourist attractions in New York City!!</p>
+            </div>
+            <div class="card-block" style="height:1147px;padding: 10px">
+                <div id="scrollNew" style="height:1120px; width:410px;">
+                    <div id="placeOf">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="w3-container w3-cell" id="esri-map-container"></div>
+
+
+
+</div>
+<div class="placeChart"><h2 style="text-align: center">Compare Places of interest</h2></div>
+
+<div class="container-fluid placeChart">
+    <div class="card with-nav-tabs ">
+        <div class="card-heading card-success">
+            <ul class="nav nav-tabs">
+                <li class=" nav-item"><a class="nav-link active" id="newp" href="#tab1success2" data-toggle="tab">Compare
+                    montly crime</a>
+                </li>
+                <li class="nav-item"><a class="nav-link" id="newp2" href="#tab2success2" data-toggle="tab">Bar graph</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body" style="background-color: #e9ffe9">
+            <div class="tab-content">
+                <div class="tab-pane fade in active" style="height: 1000px" id="tab1success2">
+                    {##}
+                    {#                    <div class="loader" id="myDiv1Loader">#}
+                    {#                    </div>#}
+
+                    <div id="myDiv1">
+                        <svg style="height:1000px;" id="chart1"></svg>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="tab2success2" style="text-align: center">
+                    <h3>City metric value for top tourist places in New York City (2016)</h3>
+
+                    <div style="margin: auto;">
+                        <div style="display: table-cell; width: auto;">
+                            <br>
+                            <select id="placesBar" class="form-control" onchange="placesHorizontalBar()"
+                                    style="height: 40px;">
+                                <option val="crime">crime</option>
+                                <option val="rating">rating</option>
+                                <option val="popularity">popularity</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <svg id="placeHorizontal" width="2000" height="1000"></svg>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div id="jsPanelLegendQuant"></div>
+
+<div id="crFill"></div>
+
+<div id="timeTracker"></div>
+
+<script>
+    $.jsPanel({
+        position: {
+            right: 10,
+            top: 20
+        },
+         container: "#crFill",
+        contentSize: {width: 400, height: 850},
+        theme: "info",
+        headerTitle: "Filter",
+        content: '<div style="height:60%"><h2>Crime Type</h2>\
+                       <div id="myDiv" style="overflow:auto; height:90%"></div></div><hr size="30"><div style="height:20%"><h2>Ratings Filter</h2>\<br><span class="material-switch">\
+                            <input id="someSwitchOptionPrimary123" name="someSwitchOption001" type="checkbox"/>\
+                            <label for="someSwitchOptionPrimary123" class="label-primary"></label>\
+                        </span> <span style="font-size: 18px ;padding-left: 10px;">Rating Stars</span>\
+                        <br><span class="material-switch">\
+                            <input id="someSwitchOptionPrimary12345" name="someSwitchOption0012" type="checkbox"/>\
+                            <label for="someSwitchOptionPrimary12345" class="label-primary"></label>\
+                        </span> <span style="font-size: 18px ;padding-left: 10px;">Review Count</span>\
+                        <br></div><hr size="30"><div> <button type="button" class="btn btn-primary btn-lg btn-block" id="updateBt">Search</button></div>',
+        callback: function () {
+            this.content.css("padding", "15px");
+        }
+    });
+
+
+    $.getJSON('http://www.localhost:5000/getCrimeFIlter', function (poi) {
+        var test = '';
+        test += '<br><span id="checkAll234" class="material-switch">';
+        test += '<input id="someSwitchOptionPrimary234" name="someSwitchOption222" type="checkbox" onclick="checkAll()"/>';
+        test += '<label for="someSwitchOptionPrimary234" class="label-primary"></label>\</span> <span style="font-size: 18px ;padding-left: 10px;">All</span>';
+        test += '<br>';
+        for (var i = 0; i < poi.result.length; i++) {
+            test += '<br><span class="material-switch"><input class="crimeC" id="someSwitchOptionPrimary' + i + '" name="someSwitchOption00' + i + '" type="checkbox"/><label for="someSwitchOptionPrimary' + i + '" class="label-primary"></label>';
+            test += '</span> <span style="font-size: 13px;padding-left: 10px;">' + poi.result[i] + '</span><br>';
+        }
+        $('#myDiv').html(test);
+        if (localStorage.getItem("crime_types") != null && localStorage.getItem("set_Cross") == "true") {
+            localStorage.setItem("set_Cross", false);
+            var crime_list = JSON.parse(localStorage.getItem("crime_types"))
+            jQuery('.crimeC').each(function () {
+                if (jQuery(this)) {
+                    crim_name = jQuery(jQuery(this).parent()).next(3).html();
+                    if (crime_list.indexOf(crim_name) != -1)
+                        jQuery(this).prop('checked', true);
+                }
+            });
+
+
+            if (localStorage.getItem("rating") == "true")
+                jQuery('#someSwitchOptionPrimary123').prop('checked', true);
+            if (localStorage.getItem("review") == "true")
+                jQuery('#someSwitchOptionPrimary12345').prop('checked', true);
+            drawBrush(parseInt(localStorage.getItem("startTime")), parseInt(localStorage.getItem("endTime")));
+            setTimeout(function () {
+                $("#updateBt").click();
+            }, 1000);
+        }
+        else {
+            drawBrush(12, 20);
+        }
+
+    });
+
+    function checkAll() {
+        if (jQuery('#someSwitchOptionPrimary234').is(':checked')) {
+            jQuery('.crimeC').each(function () {
+                jQuery(this).prop('checked', true);
+            })
+        }
+        else {
+            jQuery('.crimeC').each(function () {
+                jQuery(this).prop('checked', false);
+            })
+        }
+    }
+
+
+    function leftPanel(result) {
+
+        var row = '';
+        for (var i = 0; i < result.length; i++) {
+            row += '<div class="media" onClick="nextPage(this)"><span class="placeId" style="visibility: hidden;display:none;">' + result[i].place_id + '</span><span class="latitude" style="visibility: hidden;display:none;">' + result[i].lat + '</span><span class="longitude" style="visibility: hidden;display:none;">' + result[i].lng + '</span><div class="media-body"> <br><h4 class="media-heading"><b>' + result[i].name;
+            row += '</b></h4><p>' + result[i].formatted_address + '</p>';
+            row += '<p>Rating: ' + result[i].rating + '<span class="stars">' + result[i].rating + '</span></p></div>';
+            row += '<div class="media-left media-top"><br><img src="' + result[i].photo_reference + '" class="media-object" style="width:120px;height:125px;"></div></div><hr>';
+        }
+        $('#placeOf').html(row);
+
+
+        $.fn.stars = function () {
+            return $(this).each(function () {
+                $(this).html($('<span />').width(Math.max(0, (Math.min(5, parseFloat($(this).html())))) * 16));
+            });
+        };
+
+        $('span.stars').stars();
+
+        jQuery("#scrollNew").perfectScrollbar();
+    }
+
+    function nextPage(element) {
+        var placeId = $(element).find(".placeId").html();
+        console.log(placeId);
+        var lat = $(element).find(".latitude").html();
+        var lng = $(element).find(".longitude").html();
+
+        var arr = [];
+        var i = 0;
+        jQuery('.crimeC').each(function () {
+            if (jQuery(this).is(':checked')) {
+                arr[i] = jQuery(jQuery(this).parent()).next(3).html();
+                i++;
+            }
+        });
+        localStorage.setItem("crime_types", JSON.stringify(arr));
+        localStorage.setItem("place-id", placeId);
+        localStorage.setItem("lng", lng);
+        localStorage.setItem("lat", lat);
+        window.open("/home2", "_self");
+    }
+
+    $.jsPanel({
+        position: {
+            left: 470,
+            top:1100
+        },
+          container: "#timeTracker",
+        contentSize: {width: 1570, height: 100},
+        theme: "info",
+        headerTitle: "Time Line",
+        content: " <div id='timespan'></div>",
+        callback: function () {
+            this.content.css("padding", "15px");
+        }
+    });
+
+
+</script>
+
+<script>
+
+    var margin = {top: 5, right: 5, bottom: 50, left: 5},
+        width = 1500 - margin.left - margin.right,
+        height = 100 - margin.top - margin.bottom;
+
+    var x = oldD3.scaleTime()
+        .domain([new Date(0, 0, 0, 0, 0, 0), new Date(0, 0, 0, 23, 59, 59)])
+        .rangeRound([0, width]);
+
+    var svg = oldD3.select("#timespan").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    svg.append("g")
+        .attr("class", "axis axis--grid")
+        .attr("transform", "translate(0," + height + ")")
+        .call(oldD3.axisBottom(x)
+            .ticks(oldD3.timeHour, 24)
+            .tickSize(-height)
+            .tickFormat(function () {
+                return null;
+            }))
+        .selectAll(".tick")
+        .classed("tick--minor", function (d) {
+            return d.getHours();
+        });
+
+    svg.append("g")
+        .attr("class", "axis axis--x")
+        .attr("transform", "translate(0," + height + ")")
+        .call(oldD3.axisBottom(x)
+            .ticks(oldD3.timeHour)
+            .tickPadding(0))
+        .attr("text-anchor", null)
+        .selectAll("text")
+        .attr("x", 6);
+
+    var brush = oldD3.brushX()
+        .extent([[0, 0], [width, height]])
+        .on("brush", brushed);
+
+    var gBrush = svg.append("g")
+        .attr("class", "brush")
+        .call(brush);
+
+    var startTime = 0;
+    var endTime = 24;
+    function brushed() {
+        if (oldD3.event.sourceEvent == null) return;
+        if (oldD3.event.sourceEvent.type === "brush") return;
+        var d0 = oldD3.event.selection.map(x.invert),
+            d1 = d0.map(oldD3.timeHour.round);
+
+        // If empty when rounded, use floor instead.
+        if (d1[0] >= d1[1]) {
+            d1[0] = oldD3.timeHour.floor(d0[0]);
+            d1[1] = oldD3.timeHour.offset(d1[0]);
+        }
+        startTime = new Date(d1[0]).getHours();
+        endTime = new Date(d1[1]).getHours();
+        oldD3.select(this).call(oldD3.event.target.move, d1.map(x));
+    }
+
+    function drawBrush(a, b) {
+
+        // define   our brush extent to be begin and end of the year
+
+        startTime = a;
+        endTime = b;
+        if (b == 24)
+            gBrush.call(brush.move, [new Date(0, 0, 0, a, 0, 0), new Date(0, 0, 0, 23, 59, 59)].map(x));
+        else
+            gBrush.call(brush.move, [new Date(0, 0, 0, a, 0, 0), new Date(0, 0, 0, b, 0, 0)].map(x));
+
+    }
+
+
+</script>
+
+</body>
+</html>
