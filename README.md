@@ -18,8 +18,8 @@ Link: https://goo.gl/6d0F9j
 
 ## How to Run
 #### Database
-1. Unzip Database mentioned above to any <location>.
-2. Use commmand "mongod --dbpath <location>/data/db/" to start the mongodb server.
+1. Unzip Database mentioned above to any location.
+2. Use commmand "mongod --dbpath 'your-location'/data/db/" to start the mongodb server.
 3. Check my running "mongo" command from other terminal.
 #### Website
 1. Run main.py by using the command: "python main.py"
